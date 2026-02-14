@@ -13,13 +13,12 @@ app.get('/health', (_req, res) => {
 
 const server = createServer(app)
 
-// PeerJS 시그널링 서버 (/peerjs 경로)
+// PeerJS 시그널링 서버 (루트 경로)
 const peerServer = ExpressPeerServer(server, {
-  path: '/',
   allow_discovery: true
 })
 
-app.use('/peerjs', peerServer)
+app.use('/', peerServer)
 
 peerServer.on('connection', (client) => {
   console.log(`Peer connected: ${client.getId()}`)
@@ -93,14 +92,21 @@ relayWss.on('connection', (ws) => {
   })
 })
 
+// PeerJS의 기존 upgrade 리스너를 보존하면서 /relay만 가로채기
+const existingListeners = server.listeners('upgrade').slice()
+server.removeAllListeners('upgrade')
+
 server.on('upgrade', (request, socket, head) => {
   const url = request.url || ''
   if (url.startsWith('/relay')) {
     relayWss.handleUpgrade(request, socket, head, (ws) => {
       relayWss.emit('connection', ws, request)
     })
+  } else {
+    for (const listener of existingListeners) {
+      listener.call(server, request, socket, head)
+    }
   }
-  // PeerJS는 자체적으로 upgrade를 처리
 })
 
 server.listen(PORT, () => {
