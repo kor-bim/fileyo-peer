@@ -1,0 +1,15 @@
+name: Bug Report
+description: 서버 버그 제보
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 요약
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 관련 로그
+      description: 에러 로그/재현 로그 첨부
