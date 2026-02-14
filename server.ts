@@ -92,7 +92,7 @@ relayWss.on('connection', (ws) => {
   })
 })
 
-// PeerJS의 기존 upgrade 리스너를 보존하면서 /relay만 가로채기
+// PeerJS의 기존 upgrade 리스너를 보존하면서 /relay만 가로채기함
 const existingListeners = server.listeners('upgrade').slice()
 server.removeAllListeners('upgrade')
 
